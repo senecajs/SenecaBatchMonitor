@@ -1,19 +1,19 @@
 {
-  "name": "@seneca/config",
+  "name": "@seneca/batch-monitor",
   "version": "0.4.0",
-  "main": "dist/Config.js",
+  "main": "dist/BatchMonitor.js",
   "type": "commonjs",
-  "types": "dist/Config.d.ts",
-  "description": "Live configuration plugin for the Seneca framework.",
-  "homepage": "https://github.com/senecajs/SenecaConfig",
+  "types": "dist/BatchMonitor.d.ts",
+  "description": "Live batch-monitoruration plugin for the Seneca framework.",
+  "homepage": "https://github.com/senecajs/SenecaBatchMonitor",
   "keywords": [
     "seneca",
-    "Config"
+    "BatchMonitor"
   ],
   "author": "Richard Rodger - richardrodger.com",
   "repository": {
     "type": "git",
-    "url": "git://github.com/senecajs/SenecaConfig.git"
+    "url": "git://github.com/senecajs/SenecaBatchMonitor.git"
   },
   "scripts": {
     "prettier": "prettier --write .",
@@ -55,5 +55,8 @@
     "seneca": ">=3",
     "seneca-entity": ">=25",
     "seneca-promisify": ">=3"
+  },
+  "dependencies": {
+    "table": "^6.8.2"
   }
 }

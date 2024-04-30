@@ -1,6 +1,6 @@
-# @seneca/config
+# @seneca/batch-monitor
 
-> _Seneca Config_ is a plugin for [Seneca](http://senecajs.org)
+> _Seneca BatchMonitor_ is a plugin for [Seneca](http://senecajs.org)
 
 Live configuration plugin for the Seneca framework.
 
@@ -10,12 +10,12 @@ change it on the live system. This is useful for things like currency
 exchange rates, feature flags, A/B testing etc.
 
 
-[![npm version](https://img.shields.io/npm/v/@seneca/config.svg)](https://npmjs.com/package/@seneca/config)
-[![build](https://github.com/senecajs/SenecaConfig/actions/workflows/build.yml/badge.svg)](https://github.com/senecajs/SenecaConfig/actions/workflows/build.yml)
-[![Coverage Status](https://coveralls.io/repos/github/senecajs/SenecaConfig/badge.svg?branch=main)](https://coveralls.io/github/senecajs/SenecaConfig?branch=main)
-[![Known Vulnerabilities](https://snyk.io/test/github/senecajs/SenecaConfig/badge.svg)](https://snyk.io/test/github/senecajs/SenecaConfig)
+[![npm version](https://img.shields.io/npm/v/@seneca/batch-monitor.svg)](https://npmjs.com/package/@seneca/config)
+[![build](https://github.com/senecajs/SenecaBatchMonitor/actions/workflows/build.yml/badge.svg)](https://github.com/senecajs/SenecaBatch-Monitor/actions/workflows/build.yml)
+[![Coverage Status](https://coveralls.io/repos/github/senecajs/SenecaBatchMonitor/badge.svg?branch=main)](https://coveralls.io/github/senecajs/SenecaBatch-Monitor?branch=main)
+[![Known Vulnerabilities](https://snyk.io/test/github/senecajs/SenecaBatchMonitor/badge.svg)](https://snyk.io/test/github/senecajs/SenecaBatch-Monitor)
 [![DeepScan grade](https://deepscan.io/api/teams/5016/projects/26547/branches/846930/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=5016&pid=26547&bid=846930)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3e5e5c11a17dbfbdd894/maintainability)](https://codeclimate.com/github/senecajs/SenecaConfig/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/3e5e5c11a17dbfbdd894/maintainability)](https://codeclimate.com/github/senecajs/SenecaBatchMonitor/maintainability)
 
 | ![Voxgig](https://www.voxgig.com/res/img/vgt01r.png) | This open source module is sponsored and supported by [Voxgig](https://www.voxgig.com). |
 | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -23,28 +23,28 @@ exchange rates, feature flags, A/B testing etc.
 ## Install
 
 ```sh
-$ npm install @seneca/Config
+$ npm install @seneca/BatchMonitor
 ```
 
 ## Quick Example
 
 ```js
-seneca.use('Config', {})
+seneca.use('BatchMonitor', {})
 
-const initRes = await seneca.post('sys:config,init:val,key:a,val:1')
+const initRes = await seneca.post('sys:batch-monitor,init:val,key:a,val:1')
 // === { ok: true, key: 'a', val: 1, entry: { key: 'a', val: 1 } }
 
-const getRes = await seneca.post('sys:config,get:val,key:a')
+const getRes = await seneca.post('sys:batch-monitor,get:val,key:a')
 // === { ok: true, key: 'a', val: 1, entry: { key: 'a', val: 1 } }
 
-const setRes = await seneca.post('sys:config,set:val,key:a,val:2')
+const setRes = await seneca.post('sys:batch-monitor,set:val,key:a,val:2')
 // === { ok: true, key: 'a', val: 1, entry: { key: 'a', val: 2 } }
 
 ```
 
 ## More Examples
 
-Review the [unit tests](test/Config.test.ts) for more examples.
+Review the [unit tests](test/BatchMonitor.test.ts) for more examples.
 
 
 
@@ -66,11 +66,11 @@ Review the [unit tests](test/Config.test.ts) for more examples.
 
 ## Action Patterns
 
-* [sys:config,get:val](#-sysconfiggetval-)
-* [sys:config,init:val](#-sysconfiginitval-)
-* [sys:config,list:val](#-sysconfiglistval-)
-* [sys:config,map:val](#-sysconfigmapval-)
-* [sys:config,set:val](#-sysconfigsetval-)
+* [sys:batch-monitor,get:val](#-sysconfiggetval-)
+* [sys:batch-monitor,init:val](#-sysconfiginitval-)
+* [sys:batch-monitor,list:val](#-sysconfiglistval-)
+* [sys:batch-monitor,map:val](#-sysconfigmapval-)
+* [sys:batch-monitor,set:val](#-sysconfigsetval-)
 
 
 <!--END:action-list-->
@@ -80,9 +80,9 @@ Review the [unit tests](test/Config.test.ts) for more examples.
 
 ## Action Descriptions
 
-### &laquo; `sys:config,get:val` &raquo;
+### &laquo; `sys:batch-monitor,get:val` &raquo;
 
-Get a config value by key.
+Get a batch-monitor value by key.
 
 
 #### Parameters
@@ -92,9 +92,9 @@ Get a config value by key.
 
 
 ----------
-### &laquo; `sys:config,init:val` &raquo;
+### &laquo; `sys:batch-monitor,init:val` &raquo;
 
-Initialise a config value by key (must not exist).
+Initialise a batch-monitor value by key (must not exist).
 
 
 #### Parameters
@@ -105,9 +105,9 @@ Initialise a config value by key (must not exist).
 
 
 ----------
-### &laquo; `sys:config,list:val` &raquo;
+### &laquo; `sys:batch-monitor,list:val` &raquo;
 
-List config values by query.
+List batch-monitor values by query.
 
 
 #### Parameters
@@ -117,9 +117,9 @@ List config values by query.
 
 
 ----------
-### &laquo; `sys:config,map:val` &raquo;
+### &laquo; `sys:batch-monitor,map:val` &raquo;
 
-Get a map of config values by key prefix (dot separated).
+Get a map of batch-monitor values by key prefix (dot separated).
 
 
 #### Parameters
@@ -129,9 +129,9 @@ Get a map of config values by key prefix (dot separated).
 
 
 ----------
-### &laquo; `sys:config,set:val` &raquo;
+### &laquo; `sys:batch-monitor,set:val` &raquo;
 
-Set a config value by key (must exist).
+Set a batch-monitor value by key (must exist).
 
 
 #### Parameters
