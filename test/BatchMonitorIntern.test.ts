@@ -4,17 +4,20 @@ import { table } from 'table'
 
 import {
   updateTable,
-  format,
+  rowify,
 } from '../src/BatchMonitorIntern'
 
 
 describe('BatchMonitorIntern', () => {
   test('updateTable-empty', async () => {
-
-    const t0 = {}
-
+    const t0 = {
+      config: {
+        field: {
+          line: 'episode_id'
+        },
+      }
+    }
     const tr0 = updateTable(t0, {})
-
     console.log(tr0)
   })
 
@@ -52,7 +55,9 @@ describe('BatchMonitorIntern', () => {
     console.log('t0-END')
     console.dir(t0, { depth: null })
 
-    const f0 = format(t0)
+    const f0 = rowify(t0, {
+      start: 500,
+    })
     console.log('f0')
     console.dir(f0, { depth: null })
 

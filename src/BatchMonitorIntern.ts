@@ -6,7 +6,7 @@ function updateTable(table: any, entry: any) {
   const fieldConfig = config.field
   const lineField = fieldConfig.line
 
-  const line_id = entry.data[lineField]
+  const line_id = entry[lineField]
   // console.log('UT-a', line_id, lineField)
   if (null == line_id) {
     return table
@@ -17,7 +17,9 @@ function updateTable(table: any, entry: any) {
   // console.log('UT-b', line_id, lineField, line)
 
   const step = entry.step
-  line.step[step] = { ...line.step[step], ...entry }
+  if (line.step[step].start < entry.start) {
+    line.step[step] = { ...line.step[step], ...entry }
+  }
 
   return table
 }
@@ -30,7 +32,9 @@ function ensureLine(config: any, lineMap: any, line_id: string) {
     let lineSteps = config.line.steps
     for (let sI = 0; sI < lineSteps.length; sI++) {
       let step = lineSteps[sI]
-      line.step[step.field] = clone(step.default)
+      line.step[step.field] = clone(step.default || {})
+      line.step[step.field].start = 0
+      line.step[step.field].end = 0
     }
   }
   return line
@@ -42,8 +46,11 @@ function clone(o: any) {
 }
 
 
-function format(table: any) {
-  const rows = [['', ...table.config.line.steps.map((step: any) => step.field)]]
+function rowify(table: any, opts: any) {
+  const start = opts.start
+
+  const head = ['', ...table.config.line.steps.map((step: any) => step.field)]
+  const rows = []
 
   const lineEntries = Object.entries(table.line)
   for (let i = 0; i < lineEntries.length; i++) {
@@ -52,10 +59,19 @@ function format(table: any) {
       lineEntry[0],
       ...(table.config.line.steps.map((step: any) => {
         let s = lineEntry[1].step[step.field]
-        return s.state
+        let time = null == s.start ? '' : s.start - start
+        return 'init' === s.state ? '' : (s.state + '\n' + time)
       }))
     ])
   }
+
+  rows.sort((a: any[], b: any[]) => {
+    let ac = a[1].start
+    let bc = b[1].start
+    return bc - ac
+  })
+
+  rows.unshift(head)
 
   return rows
 }
@@ -64,5 +80,5 @@ function format(table: any) {
 
 export {
   updateTable,
-  format,
+  rowify,
 }
