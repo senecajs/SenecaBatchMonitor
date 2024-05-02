@@ -30,6 +30,7 @@ function preload(plugin) {
             entry: async (kind, line_id, step, state, info, err) => {
                 const start = Date.now();
                 const lineField = options.kind[kind].field;
+                console.log('LINE FIELD', lineField);
                 const data = {
                     ...info, // TODO: namespace?
                     batch,
@@ -49,6 +50,7 @@ function preload(plugin) {
                     ...query,
                     kind,
                 });
+                console.log('REPORT', entries.length);
                 const lineField = options.kind[kind].field;
                 const steps = options.kind[kind].steps;
                 const td = {
@@ -62,6 +64,7 @@ function preload(plugin) {
                         }
                     }
                 };
+                console.log('TABLE-DEF', td);
                 for (let i = 0; i < entries.length; i++) {
                     let entry = entries[i];
                     (0, BatchMonitorIntern_1.updateTable)(td, entry);

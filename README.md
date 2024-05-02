@@ -54,8 +54,7 @@ Review the [unit tests](test/BatchMonitor.test.ts) for more examples.
 ## Options
 
 * `debug` : boolean
-* `numparts` : number
-* `canon` : object
+* `kind` : object
 * `init$` : boolean
 
 
@@ -66,11 +65,6 @@ Review the [unit tests](test/BatchMonitor.test.ts) for more examples.
 
 ## Action Patterns
 
-* [sys:batch-monitor,get:val](#-sysconfiggetval-)
-* [sys:batch-monitor,init:val](#-sysconfiginitval-)
-* [sys:batch-monitor,list:val](#-sysconfiglistval-)
-* [sys:batch-monitor,map:val](#-sysconfigmapval-)
-* [sys:batch-monitor,set:val](#-sysconfigsetval-)
 
 
 <!--END:action-list-->
@@ -80,67 +74,6 @@ Review the [unit tests](test/BatchMonitor.test.ts) for more examples.
 
 ## Action Descriptions
 
-### &laquo; `sys:batch-monitor,get:val` &raquo;
-
-Get a batch-monitor value by key.
-
-
-#### Parameters
-
-
-* __key__ : _string_
-
-
-----------
-### &laquo; `sys:batch-monitor,init:val` &raquo;
-
-Initialise a batch-monitor value by key (must not exist).
-
-
-#### Parameters
-
-
-* __key__ : _string_
-* __existing__ : _boolean_ (optional, default: `false`)
-
-
-----------
-### &laquo; `sys:batch-monitor,list:val` &raquo;
-
-List batch-monitor values by query.
-
-
-#### Parameters
-
-
-* __q__ : _object_ (optional, default: `{}`)
-
-
-----------
-### &laquo; `sys:batch-monitor,map:val` &raquo;
-
-Get a map of batch-monitor values by key prefix (dot separated).
-
-
-#### Parameters
-
-
-* __prefix__ : _string_
-
-
-----------
-### &laquo; `sys:batch-monitor,set:val` &raquo;
-
-Set a batch-monitor value by key (must exist).
-
-
-#### Parameters
-
-
-* __key__ : _string_
-
-
-----------
 
 
 <!--END:action-desc-->

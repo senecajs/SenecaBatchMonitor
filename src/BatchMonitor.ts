@@ -63,6 +63,7 @@ function preload(this: any, plugin: any) {
       ) => {
         const start = Date.now()
         const lineField = options.kind[kind].field
+        console.log('LINE FIELD', lineField)
         const data = {
           ...info, // TODO: namespace?
           batch,
@@ -84,6 +85,8 @@ function preload(this: any, plugin: any) {
           kind,
         })
 
+        console.log('REPORT', entries.length)
+
         const lineField = options.kind[kind].field
         const steps = options.kind[kind].steps
 
@@ -98,6 +101,8 @@ function preload(this: any, plugin: any) {
             }
           }
         }
+
+        console.log('TABLE-DEF', td)
 
         for (let i = 0; i < entries.length; i++) {
           let entry = entries[i]
