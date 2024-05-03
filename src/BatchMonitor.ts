@@ -10,6 +10,7 @@ import {
 
 type BatchMonitorOptionsFull = {
   debug: boolean
+  kind: Record<string, any>
 }
 
 export type BatchMonitorOptions = Partial<BatchMonitorOptionsFull>
@@ -46,79 +47,160 @@ function BatchMonitor(this: any, options: BatchMonitorOptionsFull) {
 function preload(this: any, plugin: any) {
   const seneca = this
 
-  const options = plugin.options
+  const options: BatchMonitorOptionsFull = plugin.options
 
-  seneca.decorate('BatchMonitor', function(this: any, batch: string, run: string) {
+  seneca.decorate('BatchMonitor', function(this: any, batch: string, run?: string) {
     const seneca = this
 
-    return {
+    run = run || seneca.Nid() as string
+    const bm = new Batch(seneca, options, batch, run)
 
-      entry: async (
-        kind: string,
-        line_id: string,
-        step: string,
-        state: string,
-        info: any,
-        err: any
-      ) => {
-        const start = Date.now()
-        const lineField = options.kind[kind].field
-        console.log('LINE FIELD', lineField)
-        const data = {
-          ...info, // TODO: namespace?
-          batch,
-          run,
-          kind,
-          [lineField]: line_id,
-          step,
-          state,
-          start,
-          end: 0,
-          err,
-        }
-        await seneca.entity('sys/batch').save$(data)
-      },
+    return bm
+  })
+}
 
-      report: async (kind: string, query: any) => {
-        const entries = await seneca.entity('sys/batch').list$({
-          ...query,
-          kind,
-        })
 
-        console.log('REPORT', entries.length)
+type TableDef = {
+  line: Record<string, any>
+  config: {
+    start: number
+    field: {
+      line: string
+    },
+    line: {
+      steps: any[]
+    }
+  }
+}
 
-        const lineField = options.kind[kind].field
-        const steps = options.kind[kind].steps
 
-        const td = {
-          line: {},
-          config: {
-            field: {
-              line: lineField,
-            },
-            line: {
-              steps,
-            }
+class Batch {
+  start = Date.now()
+  seneca: any
+  options: BatchMonitorOptionsFull
+  batch: string
+  run: string
+
+  constructor(seneca: any, options: BatchMonitorOptionsFull, batch: string, run: string) {
+    this.seneca = seneca
+    this.options = options
+    this.batch = batch
+    this.run = run
+  }
+
+
+  entry(
+    this: Batch,
+    kind: string,
+    step?: string,
+    line_id?: string,
+    state?: string,
+    info?: any,
+    err?: any
+  ): any {
+    const self = this
+    if ('string' === typeof kind) {
+      if ('string' === typeof step) {
+        if ('string' === typeof line_id) {
+          if ('string' === typeof state) {
+            return self.#entry(kind, step, line_id, state, info, err)
+          }
+          else {
+            return (cstate: string, cinfo?: any, cerr?: any) =>
+              self.entry(kind, step, line_id, cstate,
+                { ...(state || {}), ...(cinfo || {}) }, cerr)
           }
         }
-
-        console.log('TABLE-DEF', td)
-
-        for (let i = 0; i < entries.length; i++) {
-          let entry = entries[i]
-          updateTable(td, entry)
+        else {
+          return (cline_id: string, cstate?: string, cinfo?: any, cerr?: any) =>
+            self.entry(kind, step, cline_id, cstate,
+              { ...(line_id || {}), ...(cinfo || {}) }, cerr)
         }
+      }
+      else {
+        return (cstep: string, cline_id?: string, cstate?: string, cinfo?: any, cerr?: any) =>
+          self.entry(kind, cstep, cline_id, cstate,
+            { ...(step || {}), ...(cinfo || {}) }, cerr)
+      }
+    }
+    else {
+      throw new Error('BatchMonitor.entry: kind is undefined (argument 0)')
+    }
+  }
 
 
-        return {
-          format: () => {
-            const rows = rowify(td, { start: 0 })
-            return table(rows)
-          }
+  async #entry(
+    this: Batch,
+    kind: string,
+    step: string,
+    line_id: string,
+    state: string,
+    info: any,
+    err: any
+  ) {
+    const start = Date.now()
+    const lineField = this.options.kind[kind].field
+
+    const data = {
+      ...info, // TODO: namespace?
+      batch: this.batch,
+      run: this.run,
+      kind,
+      [lineField]: line_id,
+      step,
+      state,
+      start,
+      end: 0,
+      err,
+    }
+    await this.seneca.entity('sys/batch').save$(data)
+  }
+
+  async report(this: Batch, kind: string, query: any) {
+    const entries = await this.seneca.entity('sys/batch').list$({
+      ...query,
+      kind,
+    })
+
+    const lineField = this.options.kind[kind].field
+    const steps = this.options.kind[kind].steps
+
+    const td: TableDef = {
+      line: {},
+      config: {
+        start: this.start,
+        field: {
+          line: lineField,
+        },
+        line: {
+          steps,
         }
       }
     }
-  })
+
+    for (let i = 0; i < entries.length; i++) {
+      let entry = entries[i]
+      updateTable(td, entry)
+    }
+
+    return new Report(td)
+  }
+
+}
+
+
+class Report {
+  td: TableDef
+
+  constructor(td: TableDef) {
+    this.td = td
+  }
+
+  format(opts: any = {}): string {
+    const start = opts.start ?? this.td.config.start ?? 0
+    const rows = rowify(this.td, { start })
+    return table(rows)
+  }
 }
 
 
