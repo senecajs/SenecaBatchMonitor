@@ -1,6 +1,6 @@
 {
   "name": "@seneca/batch-monitor",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/BatchMonitor.js",
   "type": "commonjs",
   "types": "dist/BatchMonitor.d.ts",

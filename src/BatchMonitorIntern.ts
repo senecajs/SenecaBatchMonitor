@@ -24,12 +24,14 @@ function updateTable(tableDef: Table, entry: any) {
 
   const stepName = entry.step
 
-  if (0 === line.step[stepName].start) {
-    line.step[stepName] = { ...line.step[stepName], ...entry }
-  }
-  else {
+  if (entry.state === line.step[stepName].state) {
     line.step[stepName].more.push({ ...entry })
   }
+  else {
+    // TODO: FIX: should use a blank step entry, not previous data
+    line.step[stepName] = { ...line.step[stepName], ...entry }
+  }
+
 
   return tableDef
 }

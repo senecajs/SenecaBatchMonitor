@@ -13,11 +13,12 @@ function updateTable(tableDef, entry) {
     const lineMap = tableDef.line;
     const line = ensureLine(tableDef, lineMap, line_id);
     const stepName = entry.step;
-    if (0 === line.step[stepName].start) {
-        line.step[stepName] = { ...line.step[stepName], ...entry };
+    if (entry.state === line.step[stepName].state) {
+        line.step[stepName].more.push({ ...entry });
     }
     else {
-        line.step[stepName].more.push({ ...entry });
+        // TODO: FIX: should use a blank step entry, not previous data
+        line.step[stepName] = { ...line.step[stepName], ...entry };
     }
     return tableDef;
 }
