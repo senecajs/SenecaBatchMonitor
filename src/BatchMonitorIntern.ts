@@ -27,7 +27,7 @@ function updateTable(tableDef: Table, entry: any) {
   if (entry.state === line.step[stepName].state) {
     line.step[stepName].more.push({ ...entry })
   }
-  else {
+  else if (line.step[stepName].start <= entry.start) {
     // TODO: FIX: should use a blank step entry, not previous data
     line.step[stepName] = { ...line.step[stepName], ...entry }
   }

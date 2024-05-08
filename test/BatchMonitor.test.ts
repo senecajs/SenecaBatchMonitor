@@ -104,6 +104,9 @@ describe('BatchMonitor', () => {
     await batch.entry('episode', 'chunk', 'e0', 'start', { podcast_id: 'p0' })
     await wait()
 
+    await batch.entry('episode', 'ingest', 'e1', 'done', { podcast_id: 'p0' })
+    await wait()
+
 
     // const bel = await seneca.entity('sys/batch').list$()
     // console.log(bel)
