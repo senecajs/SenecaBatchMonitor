@@ -1,4 +1,4 @@
-import type { TableDef } from './types';
-declare function updateTable(tableDef: TableDef, entry: any): TableDef;
-declare function rowify(table: any, opts: any): any[][];
+import type { Table } from './types';
+declare function updateTable(tableDef: Table, entry: any): Table;
+declare function rowify(table: Table, opts: any): string[][];
 export { updateTable, rowify, };

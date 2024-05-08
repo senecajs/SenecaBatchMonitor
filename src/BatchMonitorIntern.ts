@@ -1,13 +1,15 @@
 /* Copyright © 2024 Seneca Project Contributors, MIT License. */
 
 import type {
-  TableDef
+  Table,
+  StepDef,
+  Line,
+  Step,
 } from './types'
 
 
 
-
-function updateTable(tableDef: TableDef, entry: any) {
+function updateTable(tableDef: Table, entry: any) {
   const config = tableDef.config
   const fieldConfig = config.field
   const lineField = fieldConfig.line
@@ -20,26 +22,40 @@ function updateTable(tableDef: TableDef, entry: any) {
   const lineMap = tableDef.line
   const line = ensureLine(tableDef, lineMap, line_id)
 
-  const step = entry.step
-  if (line.step[step].start < entry.start) {
-    line.step[step] = { ...line.step[step], ...entry }
+  const stepName = entry.step
+
+  if (0 === line.step[stepName].start) {
+    line.step[stepName] = { ...line.step[stepName], ...entry }
+  }
+  else {
+    line.step[stepName].more.push({ ...entry })
   }
 
   return tableDef
 }
 
 
-function ensureLine(tableDef: TableDef, lineMap: any, line_id: string) {
+
+function ensureLine(tableDef: Table, lineMap: Record<string, Line>, line_id: string): Line {
   let line = lineMap[line_id]
   if (null == line) {
-    line = lineMap[line_id] = { step: {} }
+    line = lineMap[line_id] = {
+      step: {},
+    }
     let lineSteps = tableDef.config.line.steps
+
     for (let sI = 0; sI < lineSteps.length; sI++) {
-      let step = lineSteps[sI]
-      line.step[step.field] = clone(step.default || {})
-      line.step[step.field].state = line.step[step.field].state || 'init'
-      line.step[step.field].start = 0
-      line.step[step.field].end = 0
+      const stepDef = lineSteps[sI]
+      const name = stepDef.name
+
+      const step: Step = {
+        ...clone(stepDef.default || {}),
+        state: 'init',
+        start: 0,
+        end: 0,
+        more: [],
+      }
+      line.step[name] = step
     }
   }
   return line
@@ -51,19 +67,19 @@ function clone(o: any) {
 }
 
 
-function rowify(table: any, opts: any) {
+function rowify(table: Table, opts: any) {
   const start = opts.start
 
-  const head = ['', ...table.config.line.steps.map((step: any) => step.field)]
+  const head = ['', ...table.config.line.steps.map((step: StepDef) => step.name)]
   const rows = []
 
-  const lineEntries = Object.entries(table.line)
+  const lineEntries: Array<[string, any]> = Object.entries(table.line)
   for (let i = 0; i < lineEntries.length; i++) {
-    const lineEntry: any = lineEntries[i]
+    const lineEntry = lineEntries[i]
     rows.push([
       lineEntry[0],
-      ...(table.config.line.steps.map((step: any) => {
-        let s = lineEntry[1].step[step.field]
+      ...(table.config.line.steps.map((step: StepDef) => {
+        let s = lineEntry[1].step[step.name]
         let time = null == s.start ? '' : s.start - start
         return (null == s.state || 'init' === s.state) ? '' : (s.state + '\n' + time)
       }))

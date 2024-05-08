@@ -5,8 +5,8 @@ import { Child } from 'gubu'
 import { table } from 'table'
 
 import type {
-  TableDef,
-  Step,
+  Table,
+  StepDef,
 } from './types'
 
 
@@ -20,7 +20,7 @@ type BatchMonitorOptionsFull = {
   debug: boolean
   kind: Record<string, {
     field: string,
-    steps: Step[]
+    steps: StepDef[]
   }>
 }
 
@@ -146,19 +146,23 @@ class Batch {
 
     const data = {
       ...info, // TODO: namespace?
+      [lineField]: line_id,
+
       batch: this.batch,
       run: this.run,
       kind,
-      [lineField]: line_id,
       step,
       state,
       start,
       end: 0,
       err,
       sv: SV,
+      sid: this.seneca.id,
+      stag: this.seneca.tag,
     }
     await this.seneca.entity('sys/batch').save$(data)
   }
+
 
   async report(this: Batch, kind: string, query: any) {
     const entries = await this.seneca.entity('sys/batch').list$({
@@ -167,9 +171,9 @@ class Batch {
     })
 
     const lineField: string = this.options.kind[kind].field
-    const steps: Step[] = this.options.kind[kind].steps
+    const steps: StepDef[] = this.options.kind[kind].steps
 
-    const td: TableDef = {
+    const td: Table = {
       line: {},
       config: {
         start: this.start,
@@ -196,9 +200,9 @@ class Batch {
 
 // NOTE: multiple entries with the same state are allowed - eg. warns
 class Report {
-  td: TableDef
+  td: Table
 
-  constructor(td: TableDef) {
+  constructor(td: Table) {
     this.td = td
   }
 
@@ -218,7 +222,7 @@ const defaults = {
   kind: Child({
     field: String,
     steps: [{
-      field: String,
+      name: String,
       default: {},
     }]
   },),

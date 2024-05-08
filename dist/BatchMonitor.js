@@ -104,16 +104,18 @@ _Batch_instances = new WeakSet(), _Batch_entry = async function _Batch_entry(kin
     const lineField = this.options.kind[kind].field;
     const data = {
         ...info, // TODO: namespace?
+        [lineField]: line_id,
         batch: this.batch,
         run: this.run,
         kind,
-        [lineField]: line_id,
         step,
         state,
         start,
         end: 0,
         err,
         sv: SV,
+        sid: this.seneca.id,
+        stag: this.seneca.tag,
     };
     await this.seneca.entity('sys/batch').save$(data);
 };
@@ -136,7 +138,7 @@ const defaults = {
     kind: (0, gubu_1.Child)({
         field: String,
         steps: [{
-                field: String,
+                name: String,
                 default: {},
             }]
     }),

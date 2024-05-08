@@ -1,9 +1,9 @@
-import type { Step } from './types';
+import type { StepDef } from './types';
 type BatchMonitorOptionsFull = {
     debug: boolean;
     kind: Record<string, {
         field: string;
-        steps: Step[];
+        steps: StepDef[];
     }>;
 };
 export type BatchMonitorOptions = Partial<BatchMonitorOptionsFull>;

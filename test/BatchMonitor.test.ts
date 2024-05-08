@@ -29,11 +29,11 @@ describe('BatchMonitor', () => {
         episode: {
           field: 'episode_id',
           steps: [
-            { field: 'ingest', },
-            { field: 'extract', },
-            { field: 'audio', },
-            { field: 'transcribe', },
-            { field: 'chunk', },
+            { name: 'ingest', },
+            { name: 'extract', },
+            { name: 'audio', },
+            { name: 'transcribe', },
+            { name: 'chunk', },
           ]
         }
       }
@@ -67,11 +67,11 @@ describe('BatchMonitor', () => {
         episode: {
           field: 'episode_id',
           steps: [
-            { field: 'ingest', },
-            { field: 'extract', },
-            { field: 'audio', },
-            { field: 'transcribe', },
-            { field: 'chunk', },
+            { name: 'ingest', },
+            { name: 'extract', },
+            { name: 'audio', },
+            { name: 'transcribe', },
+            { name: 'chunk', },
           ]
         }
       }
@@ -122,11 +122,11 @@ describe('BatchMonitor', () => {
         episode: {
           field: 'episode_id',
           steps: [
-            { field: 'ingest', },
-            { field: 'extract', },
-            { field: 'audio', },
-            { field: 'transcribe', },
-            { field: 'chunk', },
+            { name: 'ingest', },
+            { name: 'extract', },
+            { name: 'audio', },
+            { name: 'transcribe', },
+            { name: 'chunk', },
           ]
         }
       }
