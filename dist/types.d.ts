@@ -15,7 +15,12 @@ type StepDef = {
     default: Record<string, any>;
 };
 type Step = {
-    state: 'init' | 'start' | 'warn' | 'fail' | 'done';
+    state: 'init' | // Before step starts.
+    'start' | // Step has started.
+    'warn' | // Step has a warning (further warnings in `more`)
+    'fail' | // Step has failed.
+    'launch' | // Step has sent all messages, but is not complete.
+    'done';
     start: number;
     end: number;
     more: Step[];
