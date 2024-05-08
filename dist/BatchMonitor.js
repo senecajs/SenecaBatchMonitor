@@ -1,5 +1,5 @@
 "use strict";
-/* Copyright © 2022 Seneca Project Contributors, MIT License. */
+/* Copyright © 2024 Seneca Project Contributors, MIT License. */
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -7,9 +7,11 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _Batch_instances, _Batch_entry;
 Object.defineProperty(exports, "__esModule", { value: true });
+const gubu_1 = require("gubu");
 const table_1 = require("table");
 const BatchMonitorIntern_1 = require("./BatchMonitorIntern");
-function BatchMonitor(options) {
+const SV = 1; // Schema version
+function BatchMonitor(_options) {
     const seneca = this;
     // const { Default } = seneca.valid
     seneca
@@ -48,6 +50,7 @@ class Batch {
     }
     entry(kind, step, line_id, state, info, err) {
         const self = this;
+        // currying
         if ('string' === typeof kind) {
             if ('string' === typeof step) {
                 if ('string' === typeof line_id) {
@@ -110,9 +113,11 @@ _Batch_instances = new WeakSet(), _Batch_entry = async function _Batch_entry(kin
         start,
         end: 0,
         err,
+        sv: SV,
     };
     await this.seneca.entity('sys/batch').save$(data);
 };
+// NOTE: multiple entries with the same state are allowed - eg. warns
 class Report {
     constructor(td) {
         this.td = td;
@@ -128,7 +133,13 @@ class Report {
 const defaults = {
     // TODO: Enable debug logging
     debug: false,
-    kind: {},
+    kind: (0, gubu_1.Child)({
+        field: String,
+        steps: [{
+                field: String,
+                default: {},
+            }]
+    }),
 };
 Object.assign(BatchMonitor, { defaults, preload });
 exports.default = BatchMonitor;

@@ -1,6 +1,14 @@
-/* Copyright © 2022 Seneca Project Contributors, MIT License. */
+/* Copyright © 2024 Seneca Project Contributors, MIT License. */
+
+import { Child } from 'gubu'
 
 import { table } from 'table'
+
+import type {
+  TableDef,
+  Step,
+} from './types'
+
 
 import {
   updateTable,
@@ -10,14 +18,19 @@ import {
 
 type BatchMonitorOptionsFull = {
   debug: boolean
-  kind: Record<string, any>
+  kind: Record<string, {
+    field: string,
+    steps: Step[]
+  }>
 }
 
 export type BatchMonitorOptions = Partial<BatchMonitorOptionsFull>
 
 
+const SV = 1 // Schema version
 
-function BatchMonitor(this: any, options: BatchMonitorOptionsFull) {
+
+function BatchMonitor(this: any, _options: BatchMonitorOptionsFull) {
   const seneca: any = this
 
   // const { Default } = seneca.valid
@@ -60,18 +73,6 @@ function preload(this: any, plugin: any) {
 }
 
 
-type TableDef = {
-  line: Record<string, any>
-  config: {
-    start: number
-    field: {
-      line: string
-    },
-    line: {
-      steps: any[]
-    }
-  }
-}
 
 
 class Batch {
@@ -99,6 +100,8 @@ class Batch {
     err?: any
   ): any {
     const self = this
+
+    // currying
     if ('string' === typeof kind) {
       if ('string' === typeof step) {
         if ('string' === typeof line_id) {
@@ -152,6 +155,7 @@ class Batch {
       start,
       end: 0,
       err,
+      sv: SV,
     }
     await this.seneca.entity('sys/batch').save$(data)
   }
@@ -162,8 +166,8 @@ class Batch {
       kind,
     })
 
-    const lineField = this.options.kind[kind].field
-    const steps = this.options.kind[kind].steps
+    const lineField: string = this.options.kind[kind].field
+    const steps: Step[] = this.options.kind[kind].steps
 
     const td: TableDef = {
       line: {},
@@ -189,6 +193,8 @@ class Batch {
 }
 
 
+
+// NOTE: multiple entries with the same state are allowed - eg. warns
 class Report {
   td: TableDef
 
@@ -209,7 +215,13 @@ class Report {
 const defaults = {
   // TODO: Enable debug logging
   debug: false,
-  kind: {},
+  kind: Child({
+    field: String,
+    steps: [{
+      field: String,
+      default: {},
+    }]
+  },),
 }
 
 

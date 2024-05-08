@@ -1,33 +1,39 @@
 /* Copyright © 2024 Seneca Project Contributors, MIT License. */
 
+import type {
+  TableDef
+} from './types'
 
-function updateTable(table: any, entry: any) {
-  const config = table.config
+
+
+
+function updateTable(tableDef: TableDef, entry: any) {
+  const config = tableDef.config
   const fieldConfig = config.field
   const lineField = fieldConfig.line
 
   const line_id = entry[lineField]
   if (null == line_id) {
-    return table
+    return tableDef
   }
 
-  const lineMap = table.line
-  const line = ensureLine(config, lineMap, line_id)
+  const lineMap = tableDef.line
+  const line = ensureLine(tableDef, lineMap, line_id)
 
   const step = entry.step
   if (line.step[step].start < entry.start) {
     line.step[step] = { ...line.step[step], ...entry }
   }
 
-  return table
+  return tableDef
 }
 
 
-function ensureLine(config: any, lineMap: any, line_id: string) {
+function ensureLine(tableDef: TableDef, lineMap: any, line_id: string) {
   let line = lineMap[line_id]
   if (null == line) {
     line = lineMap[line_id] = { step: {} }
-    let lineSteps = config.line.steps
+    let lineSteps = tableDef.config.line.steps
     for (let sI = 0; sI < lineSteps.length; sI++) {
       let step = lineSteps[sI]
       line.step[step.field] = clone(step.default || {})
