@@ -7,7 +7,6 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _Batch_instances, _Batch_entry;
 Object.defineProperty(exports, "__esModule", { value: true });
-const gubu_1 = require("gubu");
 const table_1 = require("table");
 const BatchMonitorIntern_1 = require("./BatchMonitorIntern");
 const SV = 1; // Schema version
@@ -34,7 +33,7 @@ function preload(plugin) {
     const options = plugin.options;
     seneca.decorate('BatchMonitor', function (batch, run) {
         const seneca = this;
-        run = run || seneca.Nid();
+        run = run || seneca.util.Nid();
         const bm = new Batch(seneca, options, batch, run);
         return bm;
     });
@@ -131,18 +130,19 @@ class Report {
         return (0, table_1.table)(rows);
     }
 }
-// Default options.
-const defaults = {
+// Default options, built with the shape builders that Seneca passes in
+// `valid`. Seneca 4 rejects option defaults built with Gubu.
+const defaults = ({ valid }) => ({
     // TODO: Enable debug logging
     debug: false,
-    kind: (0, gubu_1.Child)({
+    kind: valid.Child({
         field: String,
         steps: [{
                 name: String,
                 default: {},
             }]
     }),
-};
+});
 Object.assign(BatchMonitor, { defaults, preload });
 exports.default = BatchMonitor;
 if ('undefined' !== typeof module) {

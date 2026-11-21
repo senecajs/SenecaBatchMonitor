@@ -1,7 +1,5 @@
 /* Copyright © 2024 Seneca Project Contributors, MIT License. */
 
-import { Child } from 'gubu'
-
 import { table } from 'table'
 
 import type {
@@ -65,7 +63,7 @@ function preload(this: any, plugin: any) {
   seneca.decorate('BatchMonitor', function(this: any, batch: string, run?: string) {
     const seneca = this
 
-    run = run || seneca.Nid() as string
+    run = run || seneca.util.Nid() as string
     const bm = new Batch(seneca, options, batch, run)
 
     return bm
@@ -215,18 +213,19 @@ class Report {
 
 
 
-// Default options.
-const defaults = {
+// Default options, built with the shape builders that Seneca passes in
+// `valid`. Seneca 4 rejects option defaults built with Gubu.
+const defaults = ({ valid }: { valid: any }) => ({
   // TODO: Enable debug logging
   debug: false,
-  kind: Child({
+  kind: valid.Child({
     field: String,
     steps: [{
       name: String,
       default: {},
     }]
-  },),
-}
+  }),
+})
 
 
 Object.assign(BatchMonitor, { defaults, preload })
