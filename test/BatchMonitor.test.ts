@@ -13,13 +13,74 @@ describe('BatchMonitor', () => {
     expect(BatchMonitorDoc).toBeDefined()
     const seneca = Seneca({ legacy: false })
       .test()
-      .use('promisify')
-      .use('entity')
+      .use('@seneca/entity')
       .use(BatchMonitor)
 
     expect(seneca.BatchMonitor).toBeDefined()
 
     await seneca.ready()
+  })
+
+
+  test('options', async () => {
+    const seneca = makeSeneca({
+      kind: {
+        episode: {
+          field: 'episode_id',
+          steps: [
+            { name: 'ingest', },
+            { name: 'extract', default: { x: 1 } },
+          ]
+        }
+      }
+    })
+    await seneca.ready()
+
+    // Each step gets an empty default unless it gives one.
+    expect(seneca.find_plugin('BatchMonitor').options).toEqual({
+      debug: false,
+      kind: {
+        episode: {
+          field: 'episode_id',
+          steps: [
+            { name: 'ingest', default: {} },
+            { name: 'extract', default: { x: 1 } },
+          ]
+        }
+      }
+    })
+  })
+
+
+  test('run-id', async () => {
+    const seneca = makeSeneca({
+      kind: {
+        episode: {
+          field: 'episode_id',
+          steps: [{ name: 'ingest', }]
+        }
+      }
+    })
+    await seneca.ready()
+
+    // Without a run id, the batch makes one.
+    const batch = seneca.BatchMonitor('b0')
+    expect(typeof batch.run).toEqual('string')
+    expect(batch.run.length).toBeGreaterThan(0)
+
+    await batch.entry('episode', 'ingest', 'e0', 'start', { podcast_id: 'p0' })
+
+    const entries = await seneca.entity('sys/batch').list$()
+    expect(entries.length).toEqual(1)
+    expect(entries[0]).toMatchObject({
+      batch: 'b0',
+      run: batch.run,
+      kind: 'episode',
+      step: 'ingest',
+      state: 'start',
+      episode_id: 'e0',
+      podcast_id: 'p0',
+    })
   })
 
 
@@ -192,8 +253,7 @@ async function wait(t: number = 11) {
 function makeSeneca(opts: any = {}) {
   const seneca = Seneca({ legacy: false })
     .test()
-    .use('promisify')
-    .use('entity')
+    .use('@seneca/entity')
     .use(BatchMonitor, opts)
   return seneca
 }

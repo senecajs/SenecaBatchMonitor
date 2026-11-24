@@ -1,7 +1,8 @@
 "use strict";
 /* Copyright © 2024 Seneca Project Contributors, MIT License. */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rowify = exports.updateTable = void 0;
+exports.updateTable = updateTable;
+exports.rowify = rowify;
 function updateTable(tableDef, entry) {
     const config = tableDef.config;
     const fieldConfig = config.field;
@@ -22,7 +23,6 @@ function updateTable(tableDef, entry) {
     }
     return tableDef;
 }
-exports.updateTable = updateTable;
 function ensureLine(tableDef, lineMap, line_id) {
     let line = lineMap[line_id];
     if (null == line) {
@@ -72,5 +72,4 @@ function rowify(table, opts) {
     rows.unshift(head);
     return rows;
 }
-exports.rowify = rowify;
 //# sourceMappingURL=BatchMonitorIntern.js.map

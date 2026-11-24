@@ -2,18 +2,17 @@
 
 > _Seneca BatchMonitor_ is a plugin for [Seneca](http://senecajs.org)
 
-Live configuration plugin for the Seneca framework.
+Batch monitor plugin for the Seneca framework.
 
-Unlike static configuration, this plugin lets you store keyed
-configuration in your deployed persistent storage so that you can
-change it on the live system. This is useful for things like currency
-exchange rates, feature flags, A/B testing etc.
+It records the state of each step of each line of a batch run, such as
+`start` or `done`, as `sys/batch` entities, and renders the progress of a run
+as a table.
 
 
-[![npm version](https://img.shields.io/npm/v/@seneca/batch-monitor.svg)](https://npmjs.com/package/@seneca/config)
-[![build](https://github.com/senecajs/SenecaBatchMonitor/actions/workflows/build.yml/badge.svg)](https://github.com/senecajs/SenecaBatch-Monitor/actions/workflows/build.yml)
-[![Coverage Status](https://coveralls.io/repos/github/senecajs/SenecaBatchMonitor/badge.svg?branch=main)](https://coveralls.io/github/senecajs/SenecaBatch-Monitor?branch=main)
-[![Known Vulnerabilities](https://snyk.io/test/github/senecajs/SenecaBatchMonitor/badge.svg)](https://snyk.io/test/github/senecajs/SenecaBatch-Monitor)
+[![npm version](https://img.shields.io/npm/v/@seneca/batch-monitor.svg)](https://npmjs.com/package/@seneca/batch-monitor)
+[![build](https://github.com/senecajs/SenecaBatchMonitor/actions/workflows/build.yml/badge.svg)](https://github.com/senecajs/SenecaBatchMonitor/actions/workflows/build.yml)
+[![Coverage Status](https://coveralls.io/repos/github/senecajs/SenecaBatchMonitor/badge.svg?branch=main)](https://coveralls.io/github/senecajs/SenecaBatchMonitor?branch=main)
+[![Known Vulnerabilities](https://snyk.io/test/github/senecajs/SenecaBatchMonitor/badge.svg)](https://snyk.io/test/github/senecajs/SenecaBatchMonitor)
 [![DeepScan grade](https://deepscan.io/api/teams/5016/projects/26547/branches/846930/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=5016&pid=26547&bid=846930)
 [![Maintainability](https://api.codeclimate.com/v1/badges/3e5e5c11a17dbfbdd894/maintainability)](https://codeclimate.com/github/senecajs/SenecaBatchMonitor/maintainability)
 
@@ -23,23 +22,41 @@ exchange rates, feature flags, A/B testing etc.
 ## Install
 
 ```sh
-$ npm install @seneca/BatchMonitor
+$ npm install seneca@^4 @seneca/entity @seneca/batch-monitor
 ```
+
+Version 0.1 needs Seneca 4, `@seneca/entity` 29 or later, and Node.js 24 or
+later. For Seneca 3, use `@seneca/batch-monitor@0.0.7`.
 
 ## Quick Example
 
 ```js
-seneca.use('BatchMonitor', {})
+const seneca = Seneca()
+  .use('@seneca/entity')
+  .use('@seneca/batch-monitor', {
+    kind: {
+      episode: {
+        field: 'episode_id',
+        steps: [{ name: 'ingest' }, { name: 'transcribe' }],
+      },
+    },
+  })
 
-const initRes = await seneca.post('sys:batch-monitor,init:val,key:a,val:1')
-// === { ok: true, key: 'a', val: 1, entry: { key: 'a', val: 1 } }
+await seneca.ready()
 
-const getRes = await seneca.post('sys:batch-monitor,get:val,key:a')
-// === { ok: true, key: 'a', val: 1, entry: { key: 'a', val: 1 } }
+// A batch name and an optional run id (one is generated if missing).
+const batch = seneca.BatchMonitor('podcasts', 'run-1')
 
-const setRes = await seneca.post('sys:batch-monitor,set:val,key:a,val:2')
-// === { ok: true, key: 'a', val: 1, entry: { key: 'a', val: 2 } }
+// kind, step, line id, state, and extra data to store with the entry.
+await batch.entry('episode', 'ingest', 'e0', 'start', { podcast_id: 'p0' })
+await batch.entry('episode', 'ingest', 'e0', 'done', { podcast_id: 'p0' })
 
+// The arguments can also be given one call at a time.
+const ingest = batch.entry('episode', 'ingest')
+await ingest('e1', 'start')
+
+const report = await batch.report('episode', { podcast_id: 'p0' })
+console.log(report.format())
 ```
 
 ## More Examples
